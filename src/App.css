@@ -1,0 +1,67 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+select {
+  appearance: none;
+  background: linear-gradient(145deg, #ffffff, #f0f0f0);
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 16px;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 250px;
+  position: relative;
+
+  grid-column: 1; /* Explicitly place in first column */
+  justify-self: start; /* Align to start of grid cell */
+}
+
+label {
+  grid-column: 2;
+  justify-self: start;
+}
+
+select:hover {
+  box-shadow: 6px 6px 20px rgba(0, 0, 0, 0.15), 6px 1px 20px rgba(255, 255, 255, 0.9);
+  border-color: #646cff;
+}
+
+select:focus {
+  outline: none;
+  border-color: #646cff;
+  box-shadow: 6px 6px 20px rgba(0, 0, 0, 0.15), 6px 1px 20px rgba(255, 255, 255, 0.9);
+}
+
+select option {
+  background: white;
+  color: #333;
+  padding: 12px;
+}
+
+select option:hover {
+  background: #646cff;
+  color: white;
+}
+
+/* Custom dropdown arrow */
+select::after {
+  content: '▼';
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #646cff;
+  pointer-events: none;
+}
+
+.selectContainer {
+  display: grid;
+  gap: 1em;
+  grid-template-columns: 260px 1fr;
+}
