@@ -7,15 +7,7 @@ import { filterBasedCollisionDetection } from './filterBasedCollisionDetection';
 import { Label } from './Label';
 
 function App() {
-  const [selected, setSelected] = useState<Partial<Record<GrateField, string | number | null | undefined>>>({
-    type: null,
-    meshSize: null,
-    constructionType: null,
-    lc: null,
-    surfaces: null,
-    surfaceTreatment: null,
-    e: null,
-  });
+  const [selected, setSelected] = useState<Grate>({});
 
   const handleSelect = (field: GrateField, value: string) => {
     setSelected((prev) => ({
@@ -47,7 +39,7 @@ function App() {
           </option>
         ))}
       </select>
-      <label>collisions</label>
+      <Label fields={filterBasedCollisionDetection(exampleGrates, selected, 'meshSize')} />
       <select defaultValue="" onChange={(e) => handleSelect('constructionType', e.target.value)}>
         <option value="" disabled hidden>
           SELECT construction type
@@ -58,7 +50,7 @@ function App() {
           </option>
         ))}
       </select>
-      <label>collisions</label>
+      <Label fields={filterBasedCollisionDetection(exampleGrates, selected, 'constructionType')} />
       <select defaultValue="" onChange={(e) => handleSelect('lc', e.target.value)}>
         <option value="" disabled hidden>
           SELECT lc
@@ -69,7 +61,7 @@ function App() {
           </option>
         ))}
       </select>
-      <label>collisions</label>
+      <Label fields={filterBasedCollisionDetection(exampleGrates, selected, 'lc')} />
       <select defaultValue="" onChange={(e) => handleSelect('surfaces', e.target.value)}>
         <option value="" disabled hidden>
           SELECT grating surgefaces
@@ -80,7 +72,7 @@ function App() {
           </option>
         ))}
       </select>
-      <label>collisions</label>
+      <Label fields={filterBasedCollisionDetection(exampleGrates, selected, 'surfaces')} />
       <select defaultValue="" onChange={(e) => handleSelect('surfaceTreatment', e.target.value)}>
         <option value="" disabled hidden>
           SELECT surface treatment
@@ -91,7 +83,7 @@ function App() {
           </option>
         ))}
       </select>
-      <label>collisions</label>
+      <Label fields={filterBasedCollisionDetection(exampleGrates, selected, 'surfaceTreatment')} />
       <select defaultValue="" onChange={(e) => handleSelect('e', e.target.value)}>
         <option value="" disabled hidden>
           SELECT e
@@ -102,7 +94,7 @@ function App() {
           </option>
         ))}
       </select>
-      <label>collisions</label>
+      <Label fields={filterBasedCollisionDetection(exampleGrates, selected, 'e')} />
     </div>
   );
 }
