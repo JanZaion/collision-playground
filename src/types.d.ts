@@ -10,7 +10,7 @@ const exampleGrate = {
   width: 123,
   height: 20,
   surfaces: 'antislip',
-  e: 20.5,
+  e: '20.5',
   fillingBar: '20x5',
   frameBar: '20x5',
   loadBar: '20x5',
