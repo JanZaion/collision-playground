@@ -8,19 +8,12 @@ export const filterBasedCollisionDetection = (grates: Grate[], pickedValues: Gra
       return wouldFilter.length > 0 ? wouldFilter : filtered;
     }, grates);
 
-  // console.log(filteredGrates);
-
   const collisions: GrateField[] = [];
 
   if (!pickedValues[field]) {
     return collisions;
   }
 
-  // if (!filteredGrates.length) {
-  //   return collisions;
-  // }
-
-  // Get all keys except the input field
   const fieldsToCheck = (Object.keys(pickedValues) as GrateField[]).filter((key) => key !== field);
 
   for (const fieldToCheck of fieldsToCheck) {
@@ -34,8 +27,25 @@ export const filterBasedCollisionDetection = (grates: Grate[], pickedValues: Gra
   return collisions;
 };
 
-// const filteredGrates = grates.filter((grate) =>
-//   Object.entries(pickedValues)
-//     .filter(([, value]) => Boolean(value))
-//     .every(([field, value]) => grate[field as keyof Grate] === value)
-// );
+export const getCollisions = (grates: Grate[], pickedValues: Grate, fields: GrateField[]) => {
+  const collisions: Partial<Record<GrateField, GrateField[]>> = {};
+
+  for (const field of fields) {
+    collisions[field] = filterBasedCollisionDetection(grates, pickedValues, field);
+  }
+
+  // Add reverse collisions
+  for (const [field, fieldCollisions] of Object.entries(collisions)) {
+    const castField = field as GrateField;
+
+    if (fieldCollisions.length) {
+      for (const fieldCollision of fieldCollisions) {
+        if (collisions[fieldCollision] && !collisions[fieldCollision].includes(castField)) {
+          collisions[fieldCollision].push(castField);
+        }
+      }
+    }
+  }
+
+  return collisions;
+};

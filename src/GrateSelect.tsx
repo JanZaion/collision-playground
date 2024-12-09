@@ -1,16 +1,15 @@
 import { FC } from 'react';
 import { createSelection } from './createSelection';
 import { exampleGrates } from './exampleGrates';
-import { filterBasedCollisionDetection } from './filterBasedCollisionDetection';
 import { Label } from './Label';
 
 interface GrateSelectProps {
   handleSelect: (field: GrateField, value: string) => void;
-  selected: Grate;
   field: GrateField;
+  collidingFields?: GrateField[];
 }
 
-export const GrateSelect: FC<GrateSelectProps> = ({ handleSelect, selected, field }) => {
+export const GrateSelect: FC<GrateSelectProps> = ({ handleSelect, field, collidingFields }) => {
   return (
     <>
       <select defaultValue="" onChange={(e) => handleSelect(field, e.target.value)}>
@@ -23,7 +22,7 @@ export const GrateSelect: FC<GrateSelectProps> = ({ handleSelect, selected, fiel
           </option>
         ))}
       </select>
-      <Label fields={filterBasedCollisionDetection(exampleGrates, selected, field)} />
+      {collidingFields && <Label fields={collidingFields} />}
     </>
   );
 };
