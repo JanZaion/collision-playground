@@ -45,7 +45,9 @@ declare global {
 
   type FieldsMap<FormKeys extends ProductKeys, ApiKeys extends ProductKeys> = Partial<Record<FormKeys, ApiKeys>>;
 
-  type FlatPartialObject<Keys extends ProductKeys> = Partial<Record<Keys, number | string | null | undefined>>;
+  type AcceptedPrimitives = number | string | boolean | null | undefined;
+
+  type FlatPartialObject<Keys extends ProductKeys> = Partial<Record<Keys, AcceptedPrimitives>>;
 
   type ValueOf<T> = T[keyof T];
 }

@@ -87,9 +87,45 @@ export const createSelection = <Product extends StandardProduct>(
   return selection;
 };
 
-// export const createGetCollidingFields = <
-//   FormKeys extends ProductKeys,
-//   ApiKeys extends ProductKeys,
-// >(
-//   fieldsMap: FieldsMap<FormKeys, ApiKeys>,
-// ) => {
+export const translatePickedValues = <FormKeys extends ProductKeys, ApiKeys extends ProductKeys>(
+  fieldsMap: FieldsMap<FormKeys, ApiKeys>,
+  pickedValues: FlatPartialObject<FormKeys>
+) => {
+  const formFields = Object.keys(fieldsMap) as FormKeys[];
+
+  const translatedFormValues = formFields.reduce((accumulated, field) => {
+    if (pickedValues[fieldsMap[field]] as AcceptedPrimitives) {
+      accumulated[fieldsMap[field] as ApiKeys] = pickedValues[fieldsMap[field]] as AcceptedPrimitives;
+    }
+
+    return accumulated;
+  }, {} as FlatPartialObject<ApiKeys>);
+
+  return translatedFormValues;
+};
+
+export const translateCollisions = <
+  FormKeys extends ProductKeys,
+  ApiKeys extends ProductKeys,
+  Product extends StandardProduct
+>(
+  fieldsMap: FieldsMap<FormKeys, ApiKeys>,
+  collisions: Partial<Record<keyof Product, (keyof Product)[]>>
+) => {
+  // const formFields = Object.keys(fieldsMap) as FormKeys[];
+
+  // const translatedCollisions = formFields.reduce((accumulated, field) => {
+  //   const translatedField = fieldsMap[field] as ApiKeys;
+
+  //   if (collisions[field]) {
+  //     accumulated[translatedField] = collisions[field]?.map((collision) => fieldsMap[collision] as ApiKeys);
+  //   }
+
+  //   return accumulated;
+  // }, {} as Partial<Record<ApiKeys, ApiKeys[]>>);
+
+  // return translatedCollisions;
+  return 'hi';
+};
+
+// const translatedFormFields = formFields.map((field) => fieldsMap[field] as ApiKeys);
