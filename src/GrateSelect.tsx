@@ -7,7 +7,7 @@ import { fields } from './fields';
 interface GrateSelectProps {
   handleSelect: (field: GrateField, value: string) => void;
   field: GrateField;
-  collidingFields?: GrateField[];
+  collidingFields?: GrateField[] | null;
   selected: Grate;
 }
 

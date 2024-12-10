@@ -1,5 +1,5 @@
-export const filterBasedCollisionDetection = (products: Grate[], pickedValues: Grate, formField: GrateField) => {
-  const filteredGrates = Object.entries(pickedValues)
+export const filterBasedCollisionDetection = (products: Grate[], formValues: Grate, formField: GrateField) => {
+  const filteredGrates = Object.entries(formValues)
     .filter(([, value]) => Boolean(value))
     .reduce((filtered, [currentField, value]) => {
       const wouldFilter = filtered.filter((product) => product[currentField as keyof Grate] === value);
@@ -10,14 +10,14 @@ export const filterBasedCollisionDetection = (products: Grate[], pickedValues: G
 
   const collisions: GrateField[] = [];
 
-  if (!pickedValues[formField]) {
+  if (!formValues[formField]) {
     return collisions;
   }
 
-  const fieldsToCheck = (Object.keys(pickedValues) as GrateField[]).filter((key) => key !== formField);
+  const fieldsToCheck = (Object.keys(formValues) as GrateField[]).filter((key) => key !== formField);
 
   for (const fieldToCheck of fieldsToCheck) {
-    const filteredByField = filteredGrates.filter((product) => product[fieldToCheck] === pickedValues[fieldToCheck]);
+    const filteredByField = filteredGrates.filter((product) => product[fieldToCheck] === formValues[fieldToCheck]);
 
     if (!filteredByField.length) {
       collisions.push(fieldToCheck);
@@ -27,11 +27,11 @@ export const filterBasedCollisionDetection = (products: Grate[], pickedValues: G
   return collisions;
 };
 
-export const getCollisions = (products: Grate[], pickedValues: Grate, formFields: GrateField[]) => {
+export const getCollisions = (products: Grate[], formValues: Grate, formFields: GrateField[]) => {
   const collisions: Partial<Record<GrateField, GrateField[]>> = {};
 
   for (const formField of formFields) {
-    collisions[formField] = filterBasedCollisionDetection(products, pickedValues, formField);
+    collisions[formField] = filterBasedCollisionDetection(products, formValues, formField);
   }
 
   // Add reverse collisions
@@ -50,9 +50,48 @@ export const getCollisions = (products: Grate[], pickedValues: Grate, formFields
   return collisions;
 };
 
+export const createGetCollidingFields = <FormKeys extends ProductKeys, ApiKeys extends ProductKeys>(
+  fieldsMap: FieldsMap<FormKeys, ApiKeys>
+) => {
+  const getCollidingFields = (
+    formFields: FormKeys[],
+    flatFormValues: FlatPartialObject<FormKeys>,
+    flatProducts: FlatPartialObject<ApiKeys>[]
+  ) => {
+    if (!formFields.length) {
+      return {};
+    }
+
+    const translatedFormValues = formFields.reduce((accumulated, field) => {
+      if (flatFormValues[field]) {
+        accumulated[fieldsMap[field] as ApiKeys] = flatFormValues[field];
+      }
+      return accumulated;
+    }, {} as FlatPartialObject<ApiKeys>);
+
+    const translatedFormFields = formFields.map((field) => fieldsMap[field] as ApiKeys);
+
+    const apiFieldCollisions = getCollisions(flatProducts, translatedFormValues, translatedFormFields);
+
+    const formFieldCollisions = formFields.reduce((accumulated, field) => {
+      accumulated[field] = [...apiFieldCollisions[fieldsMap[field] as ApiKeys]].map(
+        (apiField) => Object.keys(fieldsMap).find((key) => fieldsMap[key as FormKeys] === apiField) as FormKeys
+      );
+
+      return accumulated;
+    }, {} as Record<FormKeys, FormKeys[]>);
+
+    console.log(formFieldCollisions);
+
+    return formFieldCollisions;
+  };
+
+  return getCollidingFields;
+};
+
 export const createSelection = (
   products: Grate[],
-  pickedValues: Grate,
+  formValues: Grate,
   formField: GrateField,
   formFields: GrateField[]
 ) => {
@@ -61,7 +100,7 @@ export const createSelection = (
   const selection: ItemsSelection = [];
 
   for (const item of selectionSet) {
-    const newPickedValues = { ...pickedValues };
+    const newPickedValues = { ...formValues };
 
     (newPickedValues[formField] as typeof item) = item;
 
@@ -78,10 +117,3 @@ export const createSelection = (
 
   return selection;
 };
-
-// export const createGetCollidingFields = <
-//   FormKeys extends ProductKeys,
-//   ApiKeys extends ProductKeys,
-// >(
-//   fieldsMap: FieldsMap<FormKeys, ApiKeys>,
-// ) => {

@@ -1,9 +1,22 @@
 import { useState } from 'react';
 import './App.css';
 import { GrateSelect } from './GrateSelect';
-import { getCollisions } from './collisionFns';
+import { createGetCollidingFields, getCollisions } from './collisionFns';
 import { exampleGrates } from './exampleGrates';
 import { fields } from './fields';
+
+const fieldsMap: FieldsMap<string, string> = {
+  type: 'typanuel',
+  meshSize: 'meshSize',
+  constructionType: 'constructionType',
+  lc: 'lc',
+  surfaces: 'surfaces',
+  materialEN: 'materialEN',
+  surfaceTreatment: 'surfaceTreatment',
+  e: 'emanuel',
+};
+
+const getCollidingFields = createGetCollidingFields(fieldsMap);
 
 function App() {
   const [selected, setSelected] = useState<Grate>({});
@@ -15,7 +28,21 @@ function App() {
     }));
   };
 
-  const collisions = getCollisions(exampleGrates, selected, fields);
+  // const collisions = getCollisions(exampleGrates, selected, fields);
+  const collisions = {
+    type: null,
+    meshSize: null,
+    constructionType: null,
+    lc: null,
+    surfaces: null,
+    materialEN: null,
+    surfaceTreatment: null,
+    e: null,
+  };
+
+  const csss = getCollidingFields(fields, selected, exampleGrates);
+
+  // console.log(csss);
 
   return (
     <div className="selectContainer">
