@@ -38,6 +38,14 @@ declare global {
     label: string;
     isInCollision: boolean;
   }[];
+
+  type ProductKeys = string;
+
+  type FieldsMap<FormKeys extends ProductKeys, ApiKeys extends ProductKeys> = Partial<Record<FormKeys, ApiKeys>>;
+
+  type FlatPartialObject<Keys extends ProductKeys> = Partial<Record<Keys, number | string | null | undefined>>;
+
+  type ValueOf<T> = T[keyof T];
 }
 
 export {};

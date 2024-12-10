@@ -1,23 +1,23 @@
-export const filterBasedCollisionDetection = (grates: Grate[], pickedValues: Grate, field: GrateField) => {
+export const filterBasedCollisionDetection = (products: Grate[], pickedValues: Grate, formField: GrateField) => {
   const filteredGrates = Object.entries(pickedValues)
     .filter(([, value]) => Boolean(value))
     .reduce((filtered, [currentField, value]) => {
-      const wouldFilter = filtered.filter((grate) => grate[currentField as keyof Grate] === value);
+      const wouldFilter = filtered.filter((product) => product[currentField as keyof Grate] === value);
 
       // Skip this filter if it would result in empty array
       return wouldFilter.length > 0 ? wouldFilter : filtered;
-    }, grates);
+    }, products);
 
   const collisions: GrateField[] = [];
 
-  if (!pickedValues[field]) {
+  if (!pickedValues[formField]) {
     return collisions;
   }
 
-  const fieldsToCheck = (Object.keys(pickedValues) as GrateField[]).filter((key) => key !== field);
+  const fieldsToCheck = (Object.keys(pickedValues) as GrateField[]).filter((key) => key !== formField);
 
   for (const fieldToCheck of fieldsToCheck) {
-    const filteredByField = filteredGrates.filter((grate) => grate[fieldToCheck] === pickedValues[fieldToCheck]);
+    const filteredByField = filteredGrates.filter((product) => product[fieldToCheck] === pickedValues[fieldToCheck]);
 
     if (!filteredByField.length) {
       collisions.push(fieldToCheck);
@@ -27,16 +27,16 @@ export const filterBasedCollisionDetection = (grates: Grate[], pickedValues: Gra
   return collisions;
 };
 
-export const getCollisions = (grates: Grate[], pickedValues: Grate, fields: GrateField[]) => {
+export const getCollisions = (products: Grate[], pickedValues: Grate, formFields: GrateField[]) => {
   const collisions: Partial<Record<GrateField, GrateField[]>> = {};
 
-  for (const field of fields) {
-    collisions[field] = filterBasedCollisionDetection(grates, pickedValues, field);
+  for (const formField of formFields) {
+    collisions[formField] = filterBasedCollisionDetection(products, pickedValues, formField);
   }
 
   // Add reverse collisions
-  for (const [field, fieldCollisions] of Object.entries(collisions)) {
-    const castField = field as GrateField;
+  for (const [formField, fieldCollisions] of Object.entries(collisions)) {
+    const castField = formField as GrateField;
 
     if (fieldCollisions.length) {
       for (const fieldCollision of fieldCollisions) {
@@ -50,23 +50,28 @@ export const getCollisions = (grates: Grate[], pickedValues: Grate, fields: Grat
   return collisions;
 };
 
-export const createSelection = (grates: Grate[], pickedValues: Grate, field: GrateField, fields: GrateField[]) => {
-  const selectionSet = new Set(grates.map((grate) => grate[field]).filter(Boolean));
+export const createSelection = (
+  products: Grate[],
+  pickedValues: Grate,
+  formField: GrateField,
+  formFields: GrateField[]
+) => {
+  const selectionSet = new Set(products.map((grate) => grate[formField]).filter(Boolean));
 
   const selection: ItemsSelection = [];
 
   for (const item of selectionSet) {
     const newPickedValues = { ...pickedValues };
 
-    (newPickedValues[field] as typeof item) = item;
+    (newPickedValues[formField] as typeof item) = item;
 
-    const collisions = getCollisions(grates, newPickedValues, fields);
+    const collisions = getCollisions(products, newPickedValues, formFields);
 
     if (item) {
       selection.push({
         value: item,
         label: String(item),
-        isInCollision: Boolean(collisions[field]?.length),
+        isInCollision: Boolean(collisions[formField]?.length),
       });
     }
   }
@@ -74,4 +79,9 @@ export const createSelection = (grates: Grate[], pickedValues: Grate, field: Gra
   return selection;
 };
 
-// TODO: add fields map
+// export const createGetCollidingFields = <
+//   FormKeys extends ProductKeys,
+//   ApiKeys extends ProductKeys,
+// >(
+//   fieldsMap: FieldsMap<FormKeys, ApiKeys>,
+// ) => {
