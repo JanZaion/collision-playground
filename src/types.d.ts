@@ -33,8 +33,10 @@ declare global {
 
   type GrateField = keyof Grate;
 
-  type ItemsSelection = {
-    value: string | number | boolean;
+  type StandardProduct = Record<string, unknown>;
+
+  type ItemsSelection<Product extends StandardProduct> = {
+    value: NonNullable<Product[keyof Product]>;
     label: string;
     isInCollision: boolean;
   }[];

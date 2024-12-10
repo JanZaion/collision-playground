@@ -1,20 +1,24 @@
-export const filterBasedCollisionDetection = (products: Grate[], pickedValues: Grate, formField: GrateField) => {
+export const filterBasedCollisionDetection = <Product extends StandardProduct>(
+  products: Product[],
+  pickedValues: Product,
+  formField: keyof Product
+) => {
   const filteredGrates = Object.entries(pickedValues)
     .filter(([, value]) => Boolean(value))
     .reduce((filtered, [currentField, value]) => {
-      const wouldFilter = filtered.filter((product) => product[currentField as keyof Grate] === value);
+      const wouldFilter = filtered.filter((product) => product[currentField as keyof Product] === value);
 
       // Skip this filter if it would result in empty array
       return wouldFilter.length > 0 ? wouldFilter : filtered;
     }, products);
 
-  const collisions: GrateField[] = [];
+  const collisions: (keyof Product)[] = [];
 
   if (!pickedValues[formField]) {
     return collisions;
   }
 
-  const fieldsToCheck = (Object.keys(pickedValues) as GrateField[]).filter((key) => key !== formField);
+  const fieldsToCheck = (Object.keys(pickedValues) as (keyof Product)[]).filter((key) => key !== formField);
 
   for (const fieldToCheck of fieldsToCheck) {
     const filteredByField = filteredGrates.filter((product) => product[fieldToCheck] === pickedValues[fieldToCheck]);
@@ -27,8 +31,12 @@ export const filterBasedCollisionDetection = (products: Grate[], pickedValues: G
   return collisions;
 };
 
-export const getCollisions = (products: Grate[], pickedValues: Grate, formFields: GrateField[]) => {
-  const collisions: Partial<Record<GrateField, GrateField[]>> = {};
+export const getCollisions = <Product extends StandardProduct>(
+  products: Product[],
+  pickedValues: Product,
+  formFields: (keyof Product)[]
+) => {
+  const collisions: Partial<Record<keyof Product, (keyof Product)[]>> = {};
 
   for (const formField of formFields) {
     collisions[formField] = filterBasedCollisionDetection(products, pickedValues, formField);
@@ -36,9 +44,9 @@ export const getCollisions = (products: Grate[], pickedValues: Grate, formFields
 
   // Add reverse collisions
   for (const [formField, fieldCollisions] of Object.entries(collisions)) {
-    const castField = formField as GrateField;
+    const castField = formField as keyof Product;
 
-    if (fieldCollisions.length) {
+    if (fieldCollisions && fieldCollisions.length) {
       for (const fieldCollision of fieldCollisions) {
         if (collisions[fieldCollision] && !collisions[fieldCollision].includes(castField)) {
           collisions[fieldCollision].push(castField);
@@ -50,15 +58,15 @@ export const getCollisions = (products: Grate[], pickedValues: Grate, formFields
   return collisions;
 };
 
-export const createSelection = (
-  products: Grate[],
-  pickedValues: Grate,
-  formField: GrateField,
-  formFields: GrateField[]
+export const createSelection = <Product extends StandardProduct>(
+  products: Product[],
+  pickedValues: Product,
+  formField: keyof Product,
+  formFields: (keyof Product)[]
 ) => {
   const selectionSet = new Set(products.map((grate) => grate[formField]).filter(Boolean));
 
-  const selection: ItemsSelection = [];
+  const selection: ItemsSelection<Product> = [];
 
   for (const item of selectionSet) {
     const newPickedValues = { ...pickedValues };
