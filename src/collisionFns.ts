@@ -49,3 +49,29 @@ export const getCollisions = (grates: Grate[], pickedValues: Grate, fields: Grat
 
   return collisions;
 };
+
+export const createSelection = (grates: Grate[], pickedValues: Grate, field: GrateField, fields: GrateField[]) => {
+  const selectionSet = new Set(grates.map((grate) => grate[field]).filter(Boolean));
+
+  const selection: ItemsSelection = [];
+
+  for (const item of selectionSet) {
+    const newPickedValues = { ...pickedValues };
+
+    (newPickedValues[field] as typeof item) = item;
+
+    const collisions = getCollisions(grates, newPickedValues, fields);
+
+    if (item) {
+      selection.push({
+        value: item,
+        label: String(item),
+        isInCollision: Boolean(collisions[field]?.length),
+      });
+    }
+  }
+
+  return selection;
+};
+
+// TODO: add fields map

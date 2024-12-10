@@ -32,6 +32,12 @@ declare global {
   type Grate = NullablePartial<typeof exampleGrate>;
 
   type GrateField = keyof Grate;
+
+  type ItemsSelection = {
+    value: string | number | boolean;
+    label: string;
+    isInCollision: boolean;
+  }[];
 }
 
 export {};

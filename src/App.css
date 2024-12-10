@@ -40,6 +40,7 @@ select option {
   background: white;
   color: #333;
   padding: 12px;
+  font-weight: bold;
 }
 
 select option:hover {
@@ -62,4 +63,11 @@ select::after {
   display: grid;
   gap: 1em;
   grid-template-columns: 260px 1fr;
+}
+
+.collision-item {
+  color: #888888;
+  opacity: 0.6;
+  cursor: not-allowed;
+  font-weight: regular;
 }
