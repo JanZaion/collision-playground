@@ -3,25 +3,29 @@ export const filterBasedCollisionDetection = <Product extends StandardProduct>(
   pickedValues: Product,
   formField: keyof Product
 ) => {
-  const filteredGrates = Object.entries(pickedValues)
-    .filter(([, value]) => Boolean(value))
-    .reduce((filtered, [currentField, value]) => {
-      const wouldFilter = filtered.filter((product) => product[currentField as keyof Product] === value);
+  const filteredPickedValues = Object.fromEntries(
+    Object.entries(pickedValues).filter(([, value]) => value != null)
+  ) as Product;
 
-      // Skip this filter if it would result in empty array
-      return wouldFilter.length > 0 ? wouldFilter : filtered;
-    }, products);
+  const filteredProducts = Object.entries(filteredPickedValues).reduce((filtered, [currentField, value]) => {
+    const wouldFilter = filtered.filter((product) => product[currentField as keyof Product] === value);
+
+    // Skip this filter if it would result in empty array
+    return wouldFilter.length > 0 ? wouldFilter : filtered;
+  }, products);
 
   const collisions: (keyof Product)[] = [];
 
-  if (!pickedValues[formField]) {
+  if (!filteredPickedValues[formField]) {
     return collisions;
   }
 
-  const fieldsToCheck = (Object.keys(pickedValues) as (keyof Product)[]).filter((key) => key !== formField);
+  const fieldsToCheck = (Object.keys(filteredPickedValues) as (keyof Product)[]).filter((key) => key !== formField);
 
   for (const fieldToCheck of fieldsToCheck) {
-    const filteredByField = filteredGrates.filter((product) => product[fieldToCheck] === pickedValues[fieldToCheck]);
+    const filteredByField = filteredProducts.filter(
+      (product) => product[fieldToCheck] === filteredPickedValues[fieldToCheck]
+    );
 
     if (!filteredByField.length) {
       collisions.push(fieldToCheck);

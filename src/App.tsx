@@ -6,7 +6,16 @@ import { exampleGrates } from './exampleGrates';
 import { fields, fieldsMap } from './fields';
 
 function App() {
-  const [selected, setSelected] = useState<Grate>({});
+  const [selected, setSelected] = useState<Grate>({
+    type: null,
+    meshSize: null,
+    constructionType: null,
+    lc: null,
+    surfaces: null,
+    materialEN: null,
+    surfaceTreatment: null,
+    e: null,
+  });
 
   const handleSelect = (field: GrateField, value: string) => {
     setSelected((prev) => ({
@@ -21,7 +30,7 @@ function App() {
   const translatedCollisions = translatePickedValues(fieldsMap, selected);
   const translatedBack = translateCollisions(fieldsMap, translatedCollisions);
 
-  console.log(translatedBack);
+  // console.log(translatedBack);
 
   return (
     <div className="selectContainer">
