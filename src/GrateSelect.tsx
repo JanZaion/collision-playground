@@ -2,7 +2,6 @@ import { FC } from 'react';
 import { exampleGrates } from './exampleGrates';
 import { Label } from './Label';
 import { createSelection } from './collisionFns';
-import { fields } from './fields';
 
 interface GrateSelectProps {
   handleSelect: (field: GrateField, value: string) => void;
@@ -18,7 +17,7 @@ export const GrateSelect: FC<GrateSelectProps> = ({ handleSelect, field, collidi
         <option value="" disabled hidden>
           {`SELECT ${field}`}
         </option>
-        {createSelection(exampleGrates, selected, field, fields).map((item) => (
+        {createSelection(exampleGrates, selected, field).map((item) => (
           <option
             key={String(item.value)}
             value={String(item.value)}

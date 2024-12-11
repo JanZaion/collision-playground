@@ -35,11 +35,12 @@ export const filterBasedCollisionDetection = <Product extends StandardProduct>(
   return collisions;
 };
 
-export const getCollisions = <Product extends StandardProduct>(
-  products: Product[],
-  pickedValues: Product,
-  formFields: (keyof Product)[]
-) => {
+/**
+ * @param products - Array of Product objects to process. Must be flat objects, else it wont work
+ * @param pickedValues - Picked values to filter by. Must be flat object, else it wont work. Must only contain keys that are present in the products array
+ */
+export const getCollisions = <Product extends StandardProduct>(products: Product[], pickedValues: Product) => {
+  const formFields = Object.keys(pickedValues) as (keyof Product)[];
   const collisions: Partial<Record<keyof Product, (keyof Product)[]>> = {};
 
   for (const formField of formFields) {
@@ -65,8 +66,7 @@ export const getCollisions = <Product extends StandardProduct>(
 export const createSelection = <Product extends StandardProduct>(
   products: Product[],
   pickedValues: Product,
-  formField: keyof Product,
-  formFields: (keyof Product)[]
+  formField: keyof Product
 ) => {
   const selectionSet = new Set(products.map((grate) => grate[formField]).filter(Boolean));
 
@@ -77,7 +77,7 @@ export const createSelection = <Product extends StandardProduct>(
 
     (newPickedValues[formField] as typeof item) = item;
 
-    const collisions = getCollisions(products, newPickedValues, formFields);
+    const collisions = getCollisions(products, newPickedValues);
 
     if (item) {
       selection.push({
