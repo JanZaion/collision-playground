@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { exampleGrates } from './exampleGrates';
 import { Label } from './Label';
-import { createSelection, translateFormField } from './collisionFns';
+import { createTranslatedSelectionFunction } from './collisionFns';
 import { fieldsMap } from './fields';
 
 interface GrateSelectProps {
@@ -11,6 +11,8 @@ interface GrateSelectProps {
   selected: Record<FormFields, AcceptedPrimitives>;
 }
 
+const crs = createTranslatedSelectionFunction(fieldsMap);
+
 export const GrateSelect: FC<GrateSelectProps> = ({ handleSelect, field, collidingFields, selected }) => {
   return (
     <>
@@ -18,7 +20,7 @@ export const GrateSelect: FC<GrateSelectProps> = ({ handleSelect, field, collidi
         <option value="" disabled hidden>
           {`SELECT ${field}`}
         </option>
-        {createSelection(exampleGrates, selected, translateFormField(fieldsMap, field)).map((item) => (
+        {crs(exampleGrates, selected, field).map((item) => (
           <option
             key={String(item.value)}
             value={String(item.value)}

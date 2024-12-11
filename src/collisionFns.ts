@@ -165,3 +165,38 @@ export const getCollisionsWithTranslation = <
   const collisions = getCollisions(products, translatedPickedValues as PickedValues<Product>);
   return translateCollisions(fieldsMap, collisions as Partial<Record<keyof ApiKeys, ApiKeys[]>>);
 };
+
+export const getTranslatedSelection = <
+  Product extends StandardProduct,
+  FormKeys extends ProductKeys,
+  ApiKeys extends Extract<keyof Product, string>
+>(
+  products: Product[],
+  pickedValues: FlatPartialObject<FormKeys>,
+  fieldsMap: FieldsMap<FormKeys, ApiKeys>,
+  formField: FormKeys
+) => {
+  const translatedPickedValues = translatePickedValues(fieldsMap, pickedValues);
+  return createSelection(
+    products,
+    translatedPickedValues as PickedValues<Product>,
+    translateFormField(fieldsMap, formField)
+  );
+};
+
+export const createTranslatedSelectionFunction = <
+  Product extends StandardProduct,
+  FormKeys extends ProductKeys,
+  ApiKeys extends Extract<keyof Product, string>
+>(
+  fieldsMap: FieldsMap<FormKeys, ApiKeys>
+) => {
+  return (products: Product[], pickedValues: FlatPartialObject<FormKeys>, formField: FormKeys) => {
+    const translatedPickedValues = translatePickedValues(fieldsMap, pickedValues);
+    return createSelection(
+      products,
+      translatedPickedValues as PickedValues<Product>,
+      translateFormField(fieldsMap, formField)
+    );
+  };
+};
