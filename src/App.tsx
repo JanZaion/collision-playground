@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import './App.css';
 import { GrateSelect } from './GrateSelect';
-import { getCollisions, translateCollisions, translatePickedValues } from './collisionFns';
+import { getCollisionsWithTranslation } from './collisionFns';
 import { exampleGrates } from './exampleGrates';
 import { fieldsMap } from './fields';
 
@@ -24,13 +24,7 @@ function App() {
     }));
   };
 
-  const collisions = getCollisions(exampleGrates, selected);
-
-  // console.log(translatePickedValues(fieldsMap, selected));
-  const translatedCollisions = translatePickedValues(fieldsMap, selected);
-  const translatedBack = translateCollisions(fieldsMap, translatedCollisions);
-
-  // console.log(translatedCollisions);
+  const collisions = getCollisionsWithTranslation(exampleGrates, selected, fieldsMap);
 
   return (
     <div className="selectContainer">

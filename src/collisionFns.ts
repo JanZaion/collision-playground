@@ -94,45 +94,74 @@ export const createSelection = <Product extends StandardProduct>(
   return selection;
 };
 
+// now starts the translation nonsense
+
+export const translateFormField = <FormKeys extends ProductKeys, ApiKeys extends ProductKeys>(
+  fieldsMap: FieldsMap<FormKeys, ApiKeys>,
+  field: FormKeys
+) => {
+  return fieldsMap[field] as ApiKeys;
+};
+
+export const translateApiField = <FormKeys extends ProductKeys, ApiKeys extends ProductKeys>(
+  fieldsMap: FieldsMap<FormKeys, ApiKeys>,
+  field: ApiKeys
+) => {
+  return Object.entries(fieldsMap).find(([, value]) => value === field)?.[0] as FormKeys;
+};
+
 export const translatePickedValues = <FormKeys extends ProductKeys, ApiKeys extends ProductKeys>(
   fieldsMap: FieldsMap<FormKeys, ApiKeys>,
   pickedValues: FlatPartialObject<FormKeys>
 ) => {
-  const formFields = Object.keys(fieldsMap) as FormKeys[];
+  const formFields = Object.keys(pickedValues) as FormKeys[];
 
   const translatedFormValues = formFields.reduce((accumulated, field) => {
-    if (pickedValues[fieldsMap[field]] as AcceptedPrimitives) {
-      accumulated[fieldsMap[field] as ApiKeys] = pickedValues[fieldsMap[field]] as AcceptedPrimitives;
-    }
-
+    accumulated[fieldsMap[field] as ApiKeys] = pickedValues[field];
     return accumulated;
   }, {} as FlatPartialObject<ApiKeys>);
 
   return translatedFormValues;
 };
 
-export const translateCollisions = <
-  FormKeys extends ProductKeys,
-  ApiKeys extends ProductKeys,
-  Product extends StandardProduct
->(
-  fieldsMap: FieldsMap<FormKeys, ApiKeys>,
-  collisions: Partial<Record<keyof Product, (keyof Product)[]>>
+const getKeyByValue = <FormKeys extends ProductKeys, ApiKeys extends ProductKeys>(
+  value: ApiKeys,
+  fieldsMap: FieldsMap<FormKeys, ApiKeys>
 ) => {
-  // const formFields = Object.keys(fieldsMap) as FormKeys[];
-
-  // const translatedCollisions = formFields.reduce((accumulated, field) => {
-  //   const translatedField = fieldsMap[field] as ApiKeys;
-
-  //   if (collisions[field]) {
-  //     accumulated[translatedField] = collisions[field]?.map((collision) => fieldsMap[collision] as ApiKeys);
-  //   }
-
-  //   return accumulated;
-  // }, {} as Partial<Record<ApiKeys, ApiKeys[]>>);
-
-  // return translatedCollisions;
-  return 'hi';
+  const entry = Object.entries(fieldsMap).find(([, val]) => val === value);
+  return entry ? (entry[0] as FormKeys) : undefined;
 };
 
-// const translatedFormFields = formFields.map((field) => fieldsMap[field] as ApiKeys);
+export const translateCollisions = <FormKeys extends ProductKeys, ApiKeys extends ProductKeys>(
+  fieldsMap: FieldsMap<FormKeys, ApiKeys>,
+  collisions: Partial<Record<keyof ApiKeys, ApiKeys[]>>
+) => {
+  const translatedCollisions: Partial<Record<FormKeys, FormKeys[]>> = {};
+
+  for (const [field, fieldCollisions] of Object.entries(collisions)) {
+    const translatedField = getKeyByValue(field, fieldsMap);
+
+    if (translatedField) {
+      translatedCollisions[translatedField] = fieldCollisions?.map((collision) => {
+        const translatedCollision = getKeyByValue(collision, fieldsMap);
+        return translatedCollision as FormKeys;
+      });
+    }
+  }
+
+  return translatedCollisions;
+};
+
+export const getCollisionsWithTranslation = <
+  Product extends StandardProduct,
+  FormKeys extends ProductKeys,
+  ApiKeys extends Extract<keyof Product, string>
+>(
+  products: Product[],
+  pickedValues: FlatPartialObject<FormKeys>,
+  fieldsMap: FieldsMap<FormKeys, ApiKeys>
+) => {
+  const translatedPickedValues = translatePickedValues(fieldsMap, pickedValues);
+  const collisions = getCollisions(products, translatedPickedValues as PickedValues<Product>);
+  return translateCollisions(fieldsMap, collisions as Partial<Record<keyof ApiKeys, ApiKeys[]>>);
+};

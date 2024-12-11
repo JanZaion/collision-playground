@@ -1,4 +1,4 @@
-export const fieldsMap: FieldsMap<string, string> = {
+export const fieldsMap = {
   typanuel: 'type',
   meshSize: 'meshSize',
   constructionType: 'constructionType',
@@ -7,4 +7,4 @@ export const fieldsMap: FieldsMap<string, string> = {
   materialEN: 'materialEN',
   surfaceTreatment: 'surfaceTreatment',
   emanuel: 'e',
-};
+} as const;
