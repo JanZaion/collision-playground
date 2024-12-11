@@ -4,10 +4,10 @@ import { Label } from './Label';
 import { createSelection } from './collisionFns';
 
 interface GrateSelectProps {
-  handleSelect: (field: GrateField, value: string) => void;
-  field: GrateField;
-  collidingFields?: GrateField[];
-  selected: Grate;
+  handleSelect: (field: FormFields, value: string) => void;
+  field: FormFields;
+  collidingFields?: FormFields[];
+  selected: Record<FormFields, AcceptedPrimitives>;
 }
 
 export const GrateSelect: FC<GrateSelectProps> = ({ handleSelect, field, collidingFields, selected }) => {

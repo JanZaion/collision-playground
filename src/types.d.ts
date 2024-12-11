@@ -1,3 +1,5 @@
+import { fieldsMap } from './fields';
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const exampleGrate = {
   wo: 155,
@@ -50,6 +52,10 @@ declare global {
   type FlatPartialObject<Keys extends ProductKeys> = Partial<Record<Keys, AcceptedPrimitives>>;
 
   type ValueOf<T> = T[keyof T];
+
+  type FormFields = keyof typeof fieldsMap;
+
+  type PickedValues<Product extends StandardProduct> = FlatPartialObject<Extract<keyof Product, string>>;
 }
 
 export {};

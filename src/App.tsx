@@ -6,18 +6,18 @@ import { exampleGrates } from './exampleGrates';
 import { fieldsMap } from './fields';
 
 function App() {
-  const [selected, setSelected] = useState<Grate>({
-    type: null,
+  const [selected, setSelected] = useState<Record<FormFields, AcceptedPrimitives>>({
+    typanuel: null,
     meshSize: null,
     constructionType: null,
     lc: null,
     surfaces: null,
     materialEN: null,
     surfaceTreatment: null,
-    e: null,
+    emanuel: null,
   });
 
-  const handleSelect = (field: GrateField, value: string) => {
+  const handleSelect = (field: FormFields, value: string) => {
     setSelected((prev) => ({
       ...prev,
       [field]: value,
@@ -34,8 +34,13 @@ function App() {
 
   return (
     <div className="selectContainer">
-      <GrateSelect handleSelect={handleSelect} field="type" collidingFields={collisions.type} selected={selected} />
-      {selected.type === 'mesh' && (
+      <GrateSelect
+        handleSelect={handleSelect}
+        field="typanuel"
+        collidingFields={collisions.typanuel}
+        selected={selected}
+      />
+      {selected.typanuel === 'mesh' && (
         <GrateSelect
           handleSelect={handleSelect}
           field="meshSize"
@@ -43,7 +48,7 @@ function App() {
           selected={selected}
         />
       )}
-      {(selected.type === 'mesh' || selected.type === 'ladder') && (
+      {(selected.typanuel === 'mesh' || selected.typanuel === 'ladder') && (
         <GrateSelect
           handleSelect={handleSelect}
           field="constructionType"
@@ -52,7 +57,7 @@ function App() {
         />
       )}
       <GrateSelect handleSelect={handleSelect} field="lc" collidingFields={collisions.lc} selected={selected} />
-      {(selected.type === 'mesh' || selected.type === 'ladder') && (
+      {(selected.typanuel === 'mesh' || selected.typanuel === 'ladder') && (
         <GrateSelect
           handleSelect={handleSelect}
           field="surfaces"
@@ -72,7 +77,12 @@ function App() {
         collidingFields={collisions.surfaceTreatment}
         selected={selected}
       />
-      <GrateSelect handleSelect={handleSelect} field="e" collidingFields={collisions.e} selected={selected} />
+      <GrateSelect
+        handleSelect={handleSelect}
+        field="emanuel"
+        collidingFields={collisions.emanuel}
+        selected={selected}
+      />
     </div>
   );
 }

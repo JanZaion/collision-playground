@@ -1,7 +1,7 @@
 import { FC } from 'react';
 
 interface LabelProps {
-  fields: GrateField[];
+  fields: FormFields[];
 }
 
 export const Label: FC<LabelProps> = ({ fields }) => {
