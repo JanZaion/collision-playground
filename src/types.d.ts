@@ -35,7 +35,13 @@ declare global {
 
   type GrateField = keyof Grate;
 
-  type StandardProduct = Record<string, unknown>;
+  type AcceptedPrimitives = number | string | boolean | null | undefined;
+
+  type ProductKeys = string;
+
+  type FlatPartialObject<Keys extends ProductKeys> = Partial<Record<Keys, AcceptedPrimitives>>;
+
+  type StandardProduct = FlatPartialObject<ProductKeys>;
 
   type ItemsSelection<Product extends StandardProduct> = {
     value: NonNullable<Product[keyof Product]>;
@@ -43,13 +49,7 @@ declare global {
     isInCollision: boolean;
   }[];
 
-  type ProductKeys = string;
-
   type FieldsMap<FormKeys extends ProductKeys, ApiKeys extends ProductKeys> = Partial<Record<FormKeys, ApiKeys>>;
-
-  type AcceptedPrimitives = number | string | boolean | null | undefined;
-
-  type FlatPartialObject<Keys extends ProductKeys> = Partial<Record<Keys, AcceptedPrimitives>>;
 
   type ValueOf<T> = T[keyof T];
 
