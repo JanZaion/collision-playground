@@ -7,12 +7,16 @@ export const filterBasedCollisionDetection = <Product extends StandardProduct>(
     Object.entries(pickedValues).filter(([, value]) => value != null)
   ) as Product;
 
-  const filteredProducts = Object.entries(filteredPickedValues).reduce((filtered, [currentField, value]) => {
-    const wouldFilter = filtered.filter((product) => product[currentField as keyof Product] === value);
+  let filteredProducts = [...products];
+
+  for (const [currentField, value] of Object.entries(filteredPickedValues)) {
+    const wouldFilter = filteredProducts.filter((product) => product[currentField as keyof Product] === value);
 
     // Skip this filter if it would result in empty array
-    return wouldFilter.length > 0 ? wouldFilter : filtered;
-  }, products);
+    if (wouldFilter.length > 0) {
+      filteredProducts = wouldFilter;
+    }
+  }
 
   const collisions: (keyof Product)[] = [];
 
@@ -27,7 +31,7 @@ export const filterBasedCollisionDetection = <Product extends StandardProduct>(
       (product) => product[fieldToCheck] === filteredPickedValues[fieldToCheck]
     );
 
-    if (!filteredByField.length) {
+    if (filteredByField.length === 0) {
       collisions.push(fieldToCheck);
     }
   }
@@ -37,7 +41,8 @@ export const filterBasedCollisionDetection = <Product extends StandardProduct>(
 
 /**
  * @param products - Array of Product objects to process. Must be flat objects, else it wont work
- * @param pickedValues - Picked values to filter by. Must be flat object, else it wont work. Must only contain keys that are present in the products array
+ * @param pickedValues - Picked values to filter by. Must be flat object, else it wont work.
+ * Must only contain keys that are present in the products array
  */
 export const getCollisions = <Product extends StandardProduct>(
   products: Product[],
@@ -54,7 +59,7 @@ export const getCollisions = <Product extends StandardProduct>(
   for (const [formField, fieldCollisions] of Object.entries(collisions)) {
     const castField = formField as keyof Product;
 
-    if (fieldCollisions && fieldCollisions.length) {
+    if (fieldCollisions && fieldCollisions.length > 0) {
       for (const fieldCollision of fieldCollisions) {
         if (collisions[fieldCollision] && !collisions[fieldCollision].includes(castField)) {
           collisions[fieldCollision].push(castField);
@@ -99,16 +104,12 @@ export const createSelection = <Product extends StandardProduct>(
 export const translateFormField = <FormKeys extends ProductKeys, ApiKeys extends ProductKeys>(
   fieldsMap: FieldsMap<FormKeys, ApiKeys>,
   field: FormKeys
-) => {
-  return fieldsMap[field] as ApiKeys;
-};
+) => fieldsMap[field] as ApiKeys;
 
 export const translateApiField = <FormKeys extends ProductKeys, ApiKeys extends ProductKeys>(
   fieldsMap: FieldsMap<FormKeys, ApiKeys>,
   field: ApiKeys
-) => {
-  return Object.entries(fieldsMap).find(([, value]) => value === field)?.[0] as FormKeys;
-};
+) => Object.entries(fieldsMap).find(([, value]) => value === field)?.[0] as FormKeys;
 
 export const translatePickedValues = <FormKeys extends ProductKeys, ApiKeys extends ProductKeys>(
   fieldsMap: FieldsMap<FormKeys, ApiKeys>,
@@ -116,10 +117,10 @@ export const translatePickedValues = <FormKeys extends ProductKeys, ApiKeys exte
 ) => {
   const formFields = Object.keys(pickedValues) as FormKeys[];
 
-  const translatedFormValues = formFields.reduce((accumulated, field) => {
-    accumulated[fieldsMap[field] as ApiKeys] = pickedValues[field];
-    return accumulated;
-  }, {} as FlatPartialObject<ApiKeys>);
+  const translatedFormValues: FlatPartialObject<ApiKeys> = {};
+  for (const field of formFields) {
+    translatedFormValues[fieldsMap[field] as ApiKeys] = pickedValues[field];
+  }
 
   return translatedFormValues;
 };
@@ -128,7 +129,7 @@ const getKeyByValue = <FormKeys extends ProductKeys, ApiKeys extends ProductKeys
   value: ApiKeys,
   fieldsMap: FieldsMap<FormKeys, ApiKeys>
 ) => {
-  const entry = Object.entries(fieldsMap).find(([, val]) => val === value);
+  const entry = Object.entries(fieldsMap).find(([, value_]) => value_ === value);
   return entry ? (entry[0] as FormKeys) : undefined;
 };
 
@@ -184,14 +185,11 @@ export const getTranslatedSelection = <
   );
 };
 
-export const createTranslatedSelectionFunction = <
-  Product extends StandardProduct,
-  FormKeys extends ProductKeys,
-  ApiKeys extends Extract<keyof Product, string>
->(
-  fieldsMap: FieldsMap<FormKeys, ApiKeys>
-) => {
-  return (products: Product[], pickedValues: FlatPartialObject<FormKeys>, formField: FormKeys) => {
+export const createTranslatedSelectionFunction =
+  <Product extends StandardProduct, FormKeys extends ProductKeys, ApiKeys extends Extract<keyof Product, string>>(
+    fieldsMap: FieldsMap<FormKeys, ApiKeys>
+  ) =>
+  (products: Product[], pickedValues: FlatPartialObject<FormKeys>, formField: FormKeys) => {
     const translatedPickedValues = translatePickedValues(fieldsMap, pickedValues);
     return createSelection(
       products,
@@ -199,4 +197,3 @@ export const createTranslatedSelectionFunction = <
       translateFormField(fieldsMap, formField)
     );
   };
-};
